@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pathway Luxury Suites</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #C41E3A;
+    --red-dark: #9B1830;
+    --red-light: #E8304A;
+    --white: #FFFFFF;
+    --off-white: #F9F7F5;
+    --gray-100: #F3F1EF;
+    --gray-200: #E5E1DC;
+    --gray-300: #C9C3BB;
+    --gray-500: #8A8279;
+    --gray-700: #4A453F;
+    --gray-900: #1A1714;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Outfit', -apple-system, sans-serif;
+    --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body); background: var(--white);
+    color: var(--gray-900); cursor: none; overflow-x: hidden; line-height: 1.6;
+  }
+
+  /* Custom Cursor */
+  .cursor-dot {
+    width: 8px; height: 8px; background: var(--red); border-radius: 50%;
+    position: fixed; pointer-events: none; z-index: 99999;
+    transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background 0.2s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px; border: 2px solid var(--red); border-radius: 50%;
+    position: fixed; pointer-events: none; z-index: 99998;
+    transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; opacity: 0.6;
+  }
+  .cursor-dot.hover { width: 14px; height: 14px; background: var(--red-light); }
+  .cursor-ring.hover { width: 50px; height: 50px; opacity: 0.3; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--gray-100); }
+  ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+
+  /* Scroll Progress Bar */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--red-light));
+    z-index: 10001; width: 0%; transition: none;
+  }
+
+  /* Page Transition Overlay */
+  .page-transition {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--red); pointer-events: none;
+    transform: scaleY(0); transform-origin: bottom;
+  }
+  .page-transition.swipe-in {
+    animation: swipeIn 0.35s cubic-bezier(0.86, 0, 0.07, 1) forwards;
+  }
+  .page-transition.swipe-out {
+    animation: swipeOut 0.35s cubic-bezier(0.86, 0, 0.07, 1) forwards;
+  }
+  @keyframes swipeIn { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
+  @keyframes swipeOut { from { transform: scaleY(1); transform-origin: top; } to { transform: scaleY(0); transform-origin: top; } }
+
+  /* Back to Top */
+  .back-to-top {
+    position: fixed; bottom: 32px; right: 32px;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--red); color: var(--white);
+    border: none; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(196,30,58,0.35);
+    z-index: 999; opacity: 0; transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    cursor: none;
+  }
+  .back-to-top.visible { opacity: 1; transform: translateY(0); }
+  .back-to-top:hover { background: var(--red-dark); transform: translateY(-3px); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 10002;
+    background: rgba(0,0,0,0.92); display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+  }
+  .lightbox.open { display: flex; animation: fadeIn 0.3s ease; }
+  .lightbox img {
+    max-width: 85vw; max-height: 75vh;
+    object-fit: contain; border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .lightbox-close {
+    position: absolute; top: 24px; right: 32px;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white); font-size: 24px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none; transition: var(--transition);
+  }
+  .lightbox-close:hover { background: var(--red); border-color: var(--red); }
+  .lightbox-nav {
+    display: flex; gap: 16px; position: absolute; bottom: 40px;
+  }
+  .lightbox-nav button {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white); font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none; transition: var(--transition);
+  }
+  .lightbox-nav button:hover { background: var(--red); border-color: var(--red); }
+  .lightbox-counter {
+    color: rgba(255,255,255,0.5); font-size: 14px;
+    position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+    font-weight: 500; letter-spacing: 2px;
+  }
+
+  /* Staggered Grid Animation */
+  .stagger-grid .suite-card,
+  .stagger-grid .feature-item { opacity: 0; transform: translateY(30px); }
+  .stagger-grid.visible .suite-card,
+  .stagger-grid.visible .feature-item { animation: cardReveal 0.6s ease forwards; }
+  .stagger-grid.visible > :nth-child(1) { animation-delay: 0s; }
+  .stagger-grid.visible > :nth-child(2) { animation-delay: 0.1s; }
+  .stagger-grid.visible > :nth-child(3) { animation-delay: 0.2s; }
+  .stagger-grid.visible > :nth-child(4) { animation-delay: 0.3s; }
+  .stagger-grid.visible > :nth-child(5) { animation-delay: 0.4s; }
+  .stagger-grid.visible > :nth-child(6) { animation-delay: 0.5s; }
+  @keyframes cardReveal { to { opacity: 1; transform: translateY(0); } }
+
+  /* Animated Counter */
+  .counter-section { background: var(--gray-900); padding: 70px 40px; }
+  .counter-grid {
+    max-width: 1300px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+    text-align: center;
+  }
+  .counter-item { color: var(--white); }
+  .counter-num {
+    font-family: var(--font-display); font-size: 52px;
+    font-weight: 700; color: var(--red-light); display: inline-block;
+  }
+  .counter-suffix { font-family: var(--font-display); font-size: 36px; color: var(--red-light); font-weight: 700; }
+  .counter-label {
+    font-size: 14px; color: var(--gray-300);
+    text-transform: uppercase; letter-spacing: 2px; margin-top: 8px;
+  }
+
+  /* Testimonials */
+  .testimonial-section { background: var(--off-white); overflow: hidden; }
+  .testimonial-track { overflow: hidden; }
+  .testimonial-slider { display: flex; gap: 28px; transition: transform 0.6s ease; }
+  .testimonial-card {
+    min-width: calc(33.333% - 19px); background: var(--white);
+    padding: 36px; border-radius: 16px;
+    border: 1px solid var(--gray-200); flex-shrink: 0;
+  }
+  .testimonial-stars { color: #F5A623; font-size: 18px; margin-bottom: 16px; letter-spacing: 2px; }
+  .testimonial-card blockquote {
+    font-size: 15px; color: var(--gray-500); line-height: 1.8;
+    font-style: italic; margin-bottom: 20px; border: none; padding: 0;
+  }
+  .testimonial-author { font-weight: 600; color: var(--gray-900); font-size: 15px; }
+  .testimonial-role { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+  .testimonial-controls {
+    display: flex; justify-content: center; gap: 12px; margin-top: 36px;
+  }
+  .testimonial-controls button {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid var(--gray-300); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    cursor: none; transition: var(--transition); font-size: 18px; color: var(--gray-500);
+  }
+  .testimonial-controls button:hover { border-color: var(--red); color: var(--red); }
+
+  /* Hamburger Animation */
+  .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+  @media (max-width: 1024px) {
+    .testimonial-card { min-width: calc(50% - 14px); }
+    .counter-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  }
+  @media (max-width: 768px) {
+    .testimonial-card { min-width: 100%; }
+    .counter-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .counter-num { font-size: 36px; }
+    .back-to-top { bottom: 20px; right: 20px; width: 42px; height: 42px; }
+  }
+
+  /* Pages */
+  .page { display: none; animation: fadeIn 0.5s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Nav */
+  .nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--gray-200); transition: var(--transition);
+  }
+  .nav-bar.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.06); }
+  .nav-inner {
+    max-width: 1300px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 100px;
+  }
+  .logo-img { height: 90px; }
+  .logo-text { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--gray-900); }
+  .logo-text span { color: var(--red); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: 14px; font-weight: 500; color: var(--gray-700);
+    text-decoration: none; letter-spacing: 0.5px; text-transform: uppercase;
+    position: relative; padding-bottom: 4px; transition: color 0.3s; cursor: none;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px; background: var(--red); transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--red); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active-link { color: var(--red); }
+  .nav-links a.active-link::after { width: 100%; }
+  .nav-phone {
+    font-size: 14px; font-weight: 600; color: var(--red);
+    text-decoration: none; display: flex; align-items: center; gap: 8px; cursor: none;
+  }
+  .nav-phone svg { width: 16px; height: 16px; }
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    background: none; border: none; cursor: none; padding: 5px;
+  }
+  .hamburger span { width: 24px; height: 2px; background: var(--gray-900); transition: var(--transition); }
+  .mobile-menu {
+    display: none; position: fixed; top: 100px; left: 0; right: 0; bottom: 0;
+    background: var(--white); z-index: 999; padding: 40px;
+  }
+  .mobile-menu.open { display: flex; flex-direction: column; gap: 24px; }
+  .mobile-menu a {
+    font-size: 24px; font-family: var(--font-display); color: var(--gray-900);
+    text-decoration: none; padding: 12px 0; border-bottom: 1px solid var(--gray-200); cursor: none;
+  }
+  .mobile-menu a:hover { color: var(--red); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center;
+    padding: 140px 40px 80px; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 50%, var(--gray-100) 100%);
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(196,30,58,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner {
+    max-width: 1300px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    position: relative; z-index: 2;
+  }
+  .hero-tag {
+    font-size: 12px; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--red);
+    margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+  }
+  .hero-tag::before { content: ''; width: 40px; height: 2px; background: var(--red); }
+  .hero h1 {
+    font-family: var(--font-display); font-size: 56px;
+    font-weight: 700; line-height: 1.1; color: var(--gray-900); margin-bottom: 24px;
+  }
+  .hero h1 em { color: var(--red); font-style: italic; }
+  .hero p { font-size: 17px; color: var(--gray-500); line-height: 1.8; margin-bottom: 36px; max-width: 480px; }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--red); color: var(--white);
+    padding: 16px 36px; border: none; border-radius: 4px;
+    font-family: var(--font-body); font-size: 14px;
+    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    cursor: none; transition: var(--transition); text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(196,30,58,0.3); }
+  .btn-outline {
+    background: transparent; color: var(--gray-900);
+    padding: 16px 36px; border: 2px solid var(--gray-300); border-radius: 4px;
+    font-family: var(--font-body); font-size: 14px;
+    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    cursor: none; transition: var(--transition); text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--red); color: var(--red); }
+  .hero-visual { position: relative; display: flex; justify-content: center; }
+  .hero-card {
+    width: 100%; max-width: 480px; aspect-ratio: 4/5;
+    border-radius: 12px; overflow: hidden; position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+  }
+  .hero-card img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-card-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(26,23,20,0.85));
+    padding: 40px 30px 30px; color: var(--white);
+  }
+  .hero-card-overlay h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 6px; }
+  .hero-card-overlay p { font-size: 14px; opacity: 0.8; }
+  .hero-stats {
+    position: absolute; right: -40px; bottom: 60px;
+    background: var(--white); border-radius: 12px; padding: 28px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .hero-stats .stat-num { font-size: 32px; font-weight: 700; color: var(--red); font-family: var(--font-display); }
+  .hero-stats .stat-label { font-size: 13px; color: var(--gray-500); }
+
+  /* Section */
+  section { padding: 100px 40px; }
+  .section-inner { max-width: 1300px; margin: 0 auto; }
+  .section-tag {
+    font-size: 12px; font-weight: 600; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--red); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-tag::before { content: ''; width: 30px; height: 2px; background: var(--red); }
+  .section-title {
+    font-family: var(--font-display); font-size: 42px;
+    font-weight: 700; color: var(--gray-900); margin-bottom: 20px; line-height: 1.2;
+  }
+  .section-sub { font-size: 17px; color: var(--gray-500); max-width: 600px; line-height: 1.8; margin-bottom: 50px; }
+
+  /* Suite Cards */
+  .suites-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .suite-card {
+    background: var(--white); border-radius: 12px; overflow: hidden;
+    transition: var(--transition); border: 1px solid var(--gray-200); cursor: none;
+  }
+  .suite-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.08); border-color: transparent; }
+  .suite-img {
+    width: 100%; height: 220px; object-fit: cover; display: block;
+    background: var(--gray-100);
+  }
+  .suite-location {
+    display: inline-block; padding: 6px 14px;
+    background: var(--red); color: var(--white);
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; border-radius: 3px; margin: 20px 24px 0;
+  }
+  .suite-card h3 { font-family: var(--font-display); font-size: 20px; padding: 12px 24px; color: var(--gray-900); }
+  .suite-card p { padding: 0 24px 20px; font-size: 14px; color: var(--gray-500); line-height: 1.7; }
+  .suite-card .view-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 16px 24px; border-top: 1px solid var(--gray-200);
+    font-size: 13px; font-weight: 600; color: var(--red);
+    text-transform: uppercase; letter-spacing: 1px;
+    text-decoration: none; transition: var(--transition); cursor: none;
+  }
+  .suite-card .view-link:hover { gap: 14px; }
+  .suite-card .view-link svg { width: 16px; height: 16px; transition: var(--transition); }
+
+  /* Features */
+  .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .feature-item {
+    padding: 36px 28px; border-radius: 12px;
+    background: var(--off-white); text-align: center; transition: var(--transition);
+  }
+  .feature-item:hover { background: var(--white); box-shadow: 0 10px 30px rgba(0,0,0,0.06); transform: translateY(-4px); }
+  .feature-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--red); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 24px;
+  }
+  .feature-item h4 { font-family: var(--font-display); font-size: 18px; margin-bottom: 10px; }
+  .feature-item p { font-size: 14px; color: var(--gray-500); line-height: 1.7; }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .about-img-block { position: relative; }
+  .about-img-main {
+    width: 100%; border-radius: 12px; aspect-ratio: 4/3;
+    overflow: hidden; background: var(--gray-100);
+  }
+  .about-img-main img { width: 100%; height: 100%; object-fit: cover; }
+  .about-img-accent {
+    position: absolute; bottom: -30px; right: -30px;
+    width: 200px; height: 200px; border-radius: 12px;
+    background: var(--red); display: flex; align-items: center;
+    justify-content: center; color: var(--white); flex-direction: column; gap: 4px;
+    box-shadow: 0 15px 40px rgba(196,30,58,0.3);
+  }
+  .about-img-accent .num { font-size: 48px; font-weight: 700; font-family: var(--font-display); }
+  .about-img-accent .label { font-size: 13px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; }
+  .about-text h2 { font-family: var(--font-display); font-size: 42px; font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+  .about-text h2 em { color: var(--red); font-style: italic; }
+  .about-text p { font-size: 16px; color: var(--gray-500); line-height: 1.9; margin-bottom: 20px; }
+
+  .amenities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 30px; }
+  .amenity-tag {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px; background: var(--off-white); border-radius: 8px;
+    font-size: 14px; color: var(--gray-700); font-weight: 500;
+  }
+  .amenity-tag .check { color: var(--red); font-weight: 700; font-size: 16px; }
+
+  .nearby-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-top: 30px; }
+  .nearby-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; background: var(--off-white); border-radius: 8px; font-size: 14px;
+  }
+  .nearby-item .name { color: var(--gray-900); font-weight: 500; }
+  .nearby-item .dist { color: var(--red); font-weight: 600; font-size: 13px; }
+
+  /* FAQ */
+  .faq-list { max-width: 800px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--gray-200); overflow: hidden; }
+  .faq-question {
+    width: 100%; background: none; border: none;
+    padding: 28px 0; display: flex; justify-content: space-between; align-items: center;
+    cursor: none; font-family: var(--font-display); font-size: 19px;
+    color: var(--gray-900); text-align: left; transition: color 0.3s;
+  }
+  .faq-question:hover { color: var(--red); }
+  .faq-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid var(--gray-300); display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+    font-size: 20px; color: var(--gray-500); transition: var(--transition);
+  }
+  .faq-item.open .faq-icon { background: var(--red); border-color: var(--red); color: var(--white); transform: rotate(45deg); }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.4s ease; }
+  .faq-item.open .faq-answer { max-height: 500px; padding-bottom: 28px; }
+  .faq-answer p { font-size: 15px; color: var(--gray-500); line-height: 1.9; }
+
+  /* Contact */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+  .contact-info h3 { font-family: var(--font-display); font-size: 28px; margin-bottom: 24px; }
+  .contact-item { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  .contact-icon-box {
+    width: 48px; height: 48px; border-radius: 10px;
+    background: rgba(196,30,58,0.08); color: var(--red);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;
+  }
+  .contact-item label { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-500); display: block; margin-bottom: 4px; }
+  .contact-item span { font-size: 17px; color: var(--gray-900); font-weight: 500; }
+  .contact-item a { font-size: 17px; color: var(--red); font-weight: 500; text-decoration: none; cursor: none; }
+  .contact-form { background: var(--off-white); padding: 48px; border-radius: 16px; }
+  .contact-form h3 { font-family: var(--font-display); font-size: 24px; margin-bottom: 28px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gray-700); margin-bottom: 8px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 14px 18px; border: 1px solid var(--gray-200);
+    border-radius: 6px; font-family: var(--font-body); font-size: 15px;
+    color: var(--gray-900); background: var(--white); transition: border-color 0.3s; cursor: none;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--red); }
+  .form-group textarea { height: 120px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .map-section { background: var(--gray-100); }
+  .map-frame { width: 100%; height: 400px; border-radius: 12px; overflow: hidden; border: none; filter: grayscale(30%); }
+
+  /* CTA Band */
+  .cta-band {
+    background: var(--red); padding: 80px 40px;
+    text-align: center; color: var(--white); position: relative; overflow: hidden;
+  }
+  .cta-band::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .cta-band h2 { font-family: var(--font-display); font-size: 42px; font-weight: 700; margin-bottom: 16px; position: relative; }
+  .cta-band p { font-size: 17px; opacity: 0.85; margin-bottom: 36px; max-width: 500px; margin-left: auto; margin-right: auto; position: relative; }
+  .btn-white {
+    background: var(--white); color: var(--red);
+    padding: 16px 36px; border: none; border-radius: 4px;
+    font-family: var(--font-body); font-size: 14px;
+    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    cursor: none; transition: var(--transition); text-decoration: none;
+    display: inline-block; position: relative;
+  }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+
+  /* Property Detail Page */
+  .detail-back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--red);
+    text-transform: uppercase; letter-spacing: 1px;
+    text-decoration: none; cursor: none; margin-bottom: 32px;
+    transition: var(--transition);
+  }
+  .detail-back:hover { gap: 12px; }
+  .detail-back svg { width: 18px; height: 18px; }
+  .detail-gallery {
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 200px 200px; gap: 12px;
+    border-radius: 16px; overflow: hidden; margin-bottom: 48px;
+  }
+  .detail-gallery .main-img { grid-row: 1 / 3; }
+  .detail-gallery img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.4s; cursor: none;
+  }
+  .detail-gallery img:hover { transform: scale(1.03); }
+  .detail-header h1 {
+    font-family: var(--font-display); font-size: 38px;
+    font-weight: 700; margin-bottom: 8px;
+  }
+  .detail-location-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--red); font-size: 14px; font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .detail-meta {
+    display: flex; gap: 32px; margin-bottom: 32px;
+    padding: 24px 0; border-top: 1px solid var(--gray-200);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .detail-meta-item { text-align: center; }
+  .detail-meta-item .val { font-size: 22px; font-weight: 700; color: var(--red); font-family: var(--font-display); }
+  .detail-meta-item .lbl { font-size: 12px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  .detail-desc { font-size: 16px; color: var(--gray-500); line-height: 1.9; margin-bottom: 40px; }
+  .detail-amenities-title {
+    font-family: var(--font-display); font-size: 24px;
+    margin-bottom: 20px; color: var(--gray-900);
+  }
+  .detail-amenities-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 48px; }
+  .detail-amenity {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; background: var(--off-white); border-radius: 8px;
+    font-size: 14px; color: var(--gray-700); font-weight: 500;
+  }
+  .detail-amenity .check { color: var(--red); font-weight: 700; }
+  .detail-cta-box {
+    background: var(--off-white); border-radius: 16px; padding: 36px;
+    text-align: center;
+  }
+  .detail-cta-box h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 8px; }
+  .detail-cta-box p { font-size: 14px; color: var(--gray-500); margin-bottom: 20px; }
+  .detail-cta-box .btn-primary { width: 100%; text-align: center; }
+
+  /* Footer */
+  footer { background: var(--gray-900); color: var(--gray-300); padding: 80px 40px 40px; }
+  .footer-inner {
+    max-width: 1300px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px;
+  }
+  .footer-brand .logo-text { color: var(--white); font-size: 24px; margin-bottom: 16px; }
+  .footer-brand p { font-size: 14px; line-height: 1.8; color: var(--gray-500); max-width: 300px; }
+  footer h4 { font-family: var(--font-display); font-size: 18px; color: var(--white); margin-bottom: 20px; }
+  footer ul { list-style: none; }
+  footer ul li { margin-bottom: 10px; }
+  footer ul a { color: var(--gray-500); text-decoration: none; font-size: 14px; transition: color 0.3s; cursor: none; }
+  footer ul a:hover { color: var(--red-light); }
+  .footer-bottom {
+    max-width: 1300px; margin: 40px auto 0; padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--gray-500);
+  }
+  .social-links { display: flex; gap: 12px; }
+  .social-links a {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gray-500); text-decoration: none; font-size: 14px;
+    transition: var(--transition); cursor: none;
+  }
+  .social-links a:hover { border-color: var(--red); color: var(--red); background: rgba(196,30,58,0.1); }
+  .newsletter-form { display: flex; gap: 10px; margin-top: 20px; }
+  .newsletter-form input {
+    flex: 1; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05); border-radius: 4px;
+    color: var(--white); font-family: var(--font-body); font-size: 14px; cursor: none;
+  }
+  .newsletter-form input::placeholder { color: var(--gray-500); }
+  .newsletter-form button {
+    padding: 12px 20px; background: var(--red); color: var(--white);
+    border: none; border-radius: 4px; font-weight: 600;
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1px;
+    cursor: none; transition: var(--transition);
+  }
+  .newsletter-form button:hover { background: var(--red-light); }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Loader */
+  .loader {
+    position: fixed; inset: 0; z-index: 10000;
+    background: var(--white); display: flex; align-items: center;
+    justify-content: center; flex-direction: column; gap: 20px;
+    transition: opacity 0.6s ease;
+  }
+  .loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-bar { width: 200px; height: 3px; background: var(--gray-200); border-radius: 3px; overflow: hidden; }
+  .loader-bar-fill { width: 0; height: 100%; background: var(--red); border-radius: 3px; animation: load 1.2s ease forwards; }
+  @keyframes load { to { width: 100%; } }
+  .loader-text { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+  .loader-text span { color: var(--red); }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 50px; }
+    .hero-visual { display: none; }
+    .hero h1 { font-size: 42px; }
+    .suites-grid { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-grid { grid-template-columns: 1fr; gap: 50px; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .detail-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 250px 200px; }
+    .detail-gallery .main-img { grid-column: 1 / 3; grid-row: auto; }
+    .detail-amenities-grid { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 768px) {
+    .nav-links, .nav-phone { display: none; }
+    .hamburger { display: flex; }
+    .hero { padding: 140px 24px 60px; }
+    .hero h1 { font-size: 34px; }
+    section { padding: 60px 24px; }
+    .section-title { font-size: 30px; }
+    .suites-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    .form-row { grid-template-columns: 1fr; }
+    .about-img-accent { right: 10px; bottom: -20px; width: 150px; height: 150px; }
+    .about-img-accent .num { font-size: 36px; }
+    .contact-form { padding: 28px; }
+    .cta-band h2 { font-size: 30px; }
+    .cursor-dot, .cursor-ring { display: none; }
+    body { cursor: auto; }
+    a, button, input, textarea, select, .suite-card { cursor: auto !important; }
+    .amenities-grid { grid-template-columns: 1fr 1fr; }
+    .nearby-grid { grid-template-columns: 1fr; }
+    .detail-gallery { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .detail-gallery .main-img { grid-column: auto; }
+    .detail-meta { flex-wrap: wrap; gap: 20px; }
+    .detail-amenities-grid { grid-template-columns: 1fr; }
+    .detail-header h1 { font-size: 28px; }
+  }
+  @media (max-width: 480px) {
+    .amenities-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Hero clean */
+  .hero { position: relative; }
+
+  /* Filter Bar */
+  .filter-bar {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    background: var(--off-white); border: 1px solid var(--gray-200);
+    border-radius: 12px; padding: 24px 28px;
+    margin-bottom: 40px; align-items: flex-end;
+  }
+  .filter-group { flex: 1; min-width: 160px; }
+  .filter-group label {
+    display: block; font-size: 12px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--gray-500); margin-bottom: 8px;
+  }
+  .filter-group select {
+    width: 100%; padding: 12px 16px; border: 1px solid var(--gray-200);
+    border-radius: 6px; font-family: var(--font-body); font-size: 14px;
+    color: var(--gray-900); background: var(--white); cursor: none;
+    transition: border-color 0.3s; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8279' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+  .filter-group select:focus { outline: none; border-color: var(--red); }
+  .filter-reset {
+    padding: 12px 24px; background: none; border: 2px solid var(--gray-300);
+    border-radius: 6px; font-family: var(--font-body); font-size: 13px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--gray-500); cursor: none; transition: var(--transition);
+    white-space: nowrap;
+  }
+  .filter-reset:hover { border-color: var(--red); color: var(--red); }
+  .no-results {
+    text-align: center; padding: 60px 20px; grid-column: 1 / -1;
+    color: var(--gray-500); font-size: 16px;
+  }
+  .no-results h3 {
+    font-family: var(--font-display); font-size: 24px;
+    color: var(--gray-900); margin-bottom: 8px;
+  }
+  .suite-card.hidden { display: none; }
+
+  @media (max-width: 768px) {
+    .filter-bar { flex-direction: column; }
+    .filter-group { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div class="loader" id="loader">
+  <div class="loader-text">Pathway <span>Suites</span></div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Page Transition -->
+<div class="page-transition" id="pageTransition"></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+  <img id="lightboxImg" src="" alt="Gallery Image">
+  <div class="lightbox-nav">
+    <button onclick="lightboxPrev()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <button onclick="lightboxNext()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+  </div>
+</div>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<!-- Nav -->
+<nav class="nav-bar" id="navbar">
+  <div class="nav-inner">
+    <a href="#" data-page="home" style="cursor:none;text-decoration:none;">
+      <img src="https://pathwaysuites.com/wp-content/themes/pathway/images/pathway-luxury-suites-homepage-design_02.png" alt="Pathway Luxury Suites" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <div class="logo-text" style="display:none;">Pathway <span>Suites</span></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" data-page="home" class="active-link">Home</a></li>
+      <li><a href="#" data-page="about">About Us</a></li>
+      <li><a href="#" data-page="suites">Our Suites</a></li>
+      <li><a href="#" data-page="faq">FAQ</a></li>
+      <li><a href="#" data-page="contact">Contact</a></li>
+    </ul>
+    <a href="tel:1-866-684-2358" class="nav-phone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      1-866-684-2358
+    </a>
+    <button class="hamburger" id="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" data-page="home" onclick="toggleMobile()">Home</a>
+  <a href="#" data-page="about" onclick="toggleMobile()">About Us</a>
+  <a href="#" data-page="suites" onclick="toggleMobile()">Our Suites</a>
+  <a href="#" data-page="faq" onclick="toggleMobile()">FAQ</a>
+  <a href="#" data-page="contact" onclick="toggleMobile()">Contact Us</a>
+  <a href="tel:18666842358" style="color:var(--red);">Call: 1-866-684-2358</a>
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">Luxury Furnished Suites</div>
+        <h1>The New Way to Find Your <em>Luxury Suites</em></h1>
+        <p>Short term and long term furnished rental condos in the heart of downtown Mississauga. A unique alternative to costly hotel stays with superb accommodations at a reasonable price.</p>
+        <div class="hero-btns">
+          <a href="#" class="btn-primary" data-page="suites">Explore Suites</a>
+          <a href="#" class="btn-outline" data-page="contact">Contact Us</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/DSCN2108-2-360x260.jpg" alt="Pathway Penthouse Suite" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22480%22 height=%22600%22><rect fill=%22%23e8e0d8%22 width=%22480%22 height=%22600%22/></svg>'">
+          <div class="hero-card-overlay">
+            <h3>Premium Living</h3>
+            <p>Heart of Downtown Mississauga</p>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-num">45+</div>
+          <div class="stat-label">Luxury Suites</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section style="background:var(--off-white);">
+    <div class="section-inner reveal">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+        <div>
+          <div class="section-tag">Welcome</div>
+          <div class="section-title">Pathway Luxury Suites Inc.</div>
+          <p style="font-size:16px;color:var(--gray-500);line-height:1.9;margin-bottom:16px;">Welcome to Pathway Suites. Our short term and long term furnished rental condos are located in the heart of downtown Mississauga. From the corporate traveler, to the vacationing family to the individual looking to relocate to the city, the individualized style of our company is ideally suited for those looking for that personal touch.</p>
+          <p style="font-size:16px;color:var(--gray-500);line-height:1.9;">Each property is fully equipped to meet all our clients' needs. We offer a unique solution for those looking for an alternative to costly hotel stays and provide superb accommodations at a reasonable price.</p>
+        </div>
+        <div style="position:relative;">
+          <div style="border-radius:12px;overflow:hidden;aspect-ratio:4/3;">
+            <img src="https://pathwaysuites.com/wp-content/uploads/2019/05/Pathway-Luxury-Homepage-Design_54.jpg" alt="Square One Mississauga" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.style.background='linear-gradient(135deg,var(--gray-100),var(--gray-200))'">
+          </div>
+          <div style="position:absolute;bottom:-20px;left:-20px;background:var(--red);color:var(--white);padding:24px;border-radius:10px;box-shadow:0 10px 30px rgba(196,30,58,0.3);">
+            <div style="font-family:var(--font-display);font-size:14px;opacity:0.8;">Located Near</div>
+            <div style="font-family:var(--font-display);font-size:20px;font-weight:700;">Square One Mall</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-inner reveal">
+      <div class="section-tag">Featured Properties</div>
+      <div class="section-title">You Will Always Get Something Good Here</div>
+      <div class="section-sub">Choose from our selection of fully furnished luxury suites in prime Mississauga locations.</div>
+      <div class="suites-grid stagger-grid">
+        <div class="suite-card" onclick="showDetail('townhouse3br')">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/Erin-center-360x260.jpg" alt="Three Bedroom Townhouse" class="suite-img">
+          <div class="suite-location">Mississauga</div>
+          <h3>Three Bedroom Townhouse in Central Mississauga</h3>
+          <p>Spacious three bedroom townhouse perfectly located in the heart of central Mississauga.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('penthouse')">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/DSCN2108-2-360x260.jpg" alt="Penthouse Suite" class="suite-img">
+          <div class="suite-location">Mississauga</div>
+          <h3>Penthouse Luxury Suite</h3>
+          <p>Experience luxury living at its finest in our premium penthouse suite with stunning city views.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('twobr')">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2016/03/22618-360x260.jpg" alt="Two Bedroom Suite" class="suite-img">
+          <div class="suite-location">Mississauga</div>
+          <h3>Two Bedroom Luxury Suite</h3>
+          <p>Perfect for families or extended stays, with comfort and convenience downtown.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--off-white);">
+    <div class="section-inner reveal">
+      <div style="text-align:center;margin-bottom:50px;">
+        <div class="section-tag" style="justify-content:center;">Why Choose Us</div>
+        <div class="section-title" style="margin:0 auto;">More Than Just Four Walls</div>
+      </div>
+      <div class="features-grid stagger-grid">
+        <div class="feature-item"><div class="feature-icon">🍳</div><h4>Fully Equipped Kitchen</h4><p>Cook your own meals with full-sized fridge, stovetop, microwave, and all kitchenware.</p></div>
+        <div class="feature-item"><div class="feature-icon">🏊</div><h4>Pool &amp; Fitness</h4><p>Access the fitness centre, swimming pool, sauna, and hot tub during scheduled hours.</p></div>
+        <div class="feature-item"><div class="feature-icon">🅿️</div><h4>Free Parking</h4><p>One underground, secured and designated parking space included. Heated in winter.</p></div>
+        <div class="feature-item"><div class="feature-icon">📞</div><h4>Free Calls</h4><p>Free unlimited local and North America calls with dedicated WiFi and phone line.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Counter -->
+  <div class="counter-section reveal" id="counterSection">
+    <div class="counter-grid">
+      <div class="counter-item">
+        <span class="counter-num" data-target="45">0</span><span class="counter-suffix">+</span>
+        <div class="counter-label">Luxury Suites</div>
+      </div>
+      <div class="counter-item">
+        <span class="counter-num" data-target="22">0</span><span class="counter-suffix"> km</span>
+        <div class="counter-label">From Airport</div>
+      </div>
+      <div class="counter-item">
+        <span class="counter-num" data-target="24">0</span><span class="counter-suffix">/7</span>
+        <div class="counter-label">Always Open</div>
+      </div>
+      <div class="counter-item">
+        <span class="counter-num" data-target="300">0</span><span class="counter-suffix">+</span>
+        <div class="counter-label">Happy Guests</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <section class="testimonial-section">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:50px;" class="reveal">
+        <div class="section-tag" style="justify-content:center;">Guest Reviews</div>
+        <div class="section-title" style="margin:0 auto;">What Our Guests Say</div>
+      </div>
+      <div class="testimonial-track">
+        <div class="testimonial-slider" id="testimonialSlider">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <blockquote>"The host was gracious and very helpful when we needed their assistance during our stay. The listing was clean and very simple. Just as described. I would consider staying with them again."</blockquote>
+            <div class="testimonial-author">Scott Leitch</div>
+            <div class="testimonial-role">Verified Guest</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <blockquote>"I had a very great experience with Pathway Suites! The employee was very friendly. I was handed keys and a welcome letter with WiFi password and amenities info — very professional."</blockquote>
+            <div class="testimonial-author">Recent Visitor</div>
+            <div class="testimonial-role">Verified Guest</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <blockquote>"Excellent stay for a family, ideally located just 6 mins walk from Square One Mall. Self contained and well maintained apartment, basement parking and amenities were a bonus."</blockquote>
+            <div class="testimonial-author">Family Traveler</div>
+            <div class="testimonial-role">TripAdvisor Review</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★☆</div>
+            <blockquote>"Fairly clean and cute apartment. The host ensured we had a great experience. Had an exceptionally comfortable bed, central heating, and a microwave. Having a full kitchen was a bonus."</blockquote>
+            <div class="testimonial-author">Guest Reviewer</div>
+            <div class="testimonial-role">Verified Guest</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <blockquote>"The place was comfortable, quiet, and well-presented. Honest, detailed service and exactly as it was described. Easy transaction and any confusion was quickly sorted out."</blockquote>
+            <div class="testimonial-author">Business Traveler</div>
+            <div class="testimonial-role">Verified Guest</div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <blockquote>"Everything was modern, I had a fine stay. Fairly clean, nice place very close to restaurants nearby. Staff was competent, the service was terrific. Location was magnificent!"</blockquote>
+            <div class="testimonial-author">International Guest</div>
+            <div class="testimonial-role">Verified Guest</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-controls">
+        <button onclick="slideTestimonials(-1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <button onclick="slideTestimonials(1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-inner reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+      <div style="border-radius:12px;overflow:hidden;aspect-ratio:4/3;">
+        <img src="https://pathwaysuites.com/wp-content/uploads/2019/05/Pathway-Luxury-Homepage-Design_54.jpg" alt="Square One Mississauga" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div>
+        <div class="section-tag">Explore</div>
+        <div class="section-title">Where to Go in Mississauga?</div>
+        <p style="font-size:16px;color:var(--gray-500);line-height:1.9;margin-bottom:16px;">Just steps away from one of the biggest malls in the province — Square One Mall — you will be surrounded by eclectic restaurants and trendy cafés.</p>
+        <p style="font-size:16px;color:var(--gray-500);line-height:1.9;">Find Royal Bank of Canada, restaurants, clinics, and cafeterias in the building. Enjoy walking to Mississauga City Hall, YMCA, Central Library, Mississauga Art Gallery, Living Arts Centre and the exciting Mississauga Celebration Square.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-band reveal"><h2>Ready to Book Your Stay?</h2><p>Contact us today and our support team will assist you within 24 hours.</p><a href="#" class="btn-white" data-page="contact">Get in Touch</a></div>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<div class="page" id="page-about">
+  <section style="padding-top:140px;">
+    <div class="section-inner">
+      <div class="about-grid reveal">
+        <div class="about-img-block">
+          <div class="about-img-main">
+            <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/Erin-center-360x260.jpg" alt="Pathway Suites">
+          </div>
+          <div class="about-img-accent"><div class="num">45+</div><div class="label">Luxury Units</div></div>
+        </div>
+        <div class="about-text">
+          <div class="section-tag">About Us</div>
+          <h2>Welcome to Pathway <em>Luxury Suites</em></h2>
+          <p>Our short term and long term furnished rental condos are located in the heart of downtown Mississauga. From the corporate traveler, to the vacationing family to the individual looking to relocate to the city, the individualized style of the company is ideally suited for those looking for that personal touch.</p>
+          <p>Each property is fully equipped to meet all our clients' needs. We offer a unique solution for those looking for an alternative to costly hotel stays and provide superb accommodations at a reasonable price.</p>
+          <p>With an offering of luxurious, high quality furnished suites supported by great customer service, Pathway Suites places client satisfaction above all else. Our exciting portfolio has been designed with quality, comfort, convenience, privacy and security in mind, each unit selectively handpicked based on location and individually designed with particular attention to detail.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section style="background:var(--off-white);">
+    <div class="section-inner reveal">
+      <div style="text-align:center;margin-bottom:50px;">
+        <div class="section-tag" style="justify-content:center;">Comforts of Home</div>
+        <div class="section-title" style="margin:0 auto;">Everything You Need</div>
+      </div>
+      <p style="font-size:16px;color:var(--gray-500);line-height:1.9;max-width:800px;margin:0 auto 32px;text-align:center;">The furnished suites are fully equipped with all of the comforts of home, including all kitchenware, bedding, and electrical appliances, designed with an artistic flair. Housekeeping available on request.</p>
+      <div class="amenities-grid">
+        <div class="amenity-tag"><span class="check">✓</span> Fully Equipped Kitchen</div>
+        <div class="amenity-tag"><span class="check">✓</span> Air Conditioning</div>
+        <div class="amenity-tag"><span class="check">✓</span> Flat-Screen TV</div>
+        <div class="amenity-tag"><span class="check">✓</span> Free WiFi</div>
+        <div class="amenity-tag"><span class="check">✓</span> Washer &amp; Dryer</div>
+        <div class="amenity-tag"><span class="check">✓</span> Private Balcony</div>
+        <div class="amenity-tag"><span class="check">✓</span> Soundproof Windows</div>
+        <div class="amenity-tag"><span class="check">✓</span> Premium Bedding</div>
+        <div class="amenity-tag"><span class="check">✓</span> Indoor Pool</div>
+        <div class="amenity-tag"><span class="check">✓</span> Fitness Centre</div>
+        <div class="amenity-tag"><span class="check">✓</span> Sauna &amp; Hot Tub</div>
+        <div class="amenity-tag"><span class="check">✓</span> Underground Parking</div>
+        <div class="amenity-tag"><span class="check">✓</span> Free Local Calls</div>
+        <div class="amenity-tag"><span class="check">✓</span> Game Room</div>
+        <div class="amenity-tag"><span class="check">✓</span> Concierge Service</div>
+        <div class="amenity-tag"><span class="check">✓</span> Business Centre</div>
+        <div class="amenity-tag"><span class="check">✓</span> Luggage Storage</div>
+        <div class="amenity-tag"><span class="check">✓</span> Laundry Facilities</div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="section-inner reveal">
+      <div style="text-align:center;margin-bottom:40px;">
+        <div class="section-tag" style="justify-content:center;">Location</div>
+        <div class="section-title" style="margin:0 auto;">Nearby Attractions</div>
+        <p style="font-size:16px;color:var(--gray-500);margin-top:12px;">Strategically located with access to train stations, Express Go Bus Service, public transport and all major highways.</p>
+      </div>
+      <div class="nearby-grid">
+        <div class="nearby-item"><span class="name">Square One Shopping Centre</span><span class="dist">9 min walk</span></div>
+        <div class="nearby-item"><span class="name">Living Arts Centre</span><span class="dist">5 min walk</span></div>
+        <div class="nearby-item"><span class="name">Mississauga Civic Centre</span><span class="dist">0.2 km</span></div>
+        <div class="nearby-item"><span class="name">Mississauga Central Library</span><span class="dist">0.3 km</span></div>
+        <div class="nearby-item"><span class="name">Celebration Square</span><span class="dist">0.5 km</span></div>
+        <div class="nearby-item"><span class="name">YMCA</span><span class="dist">Walking distance</span></div>
+        <div class="nearby-item"><span class="name">Mississauga Art Gallery</span><span class="dist">7 min walk</span></div>
+        <div class="nearby-item"><span class="name">Toronto Pearson Airport</span><span class="dist">~22 km / 15-20 min</span></div>
+        <div class="nearby-item"><span class="name">Downtown Toronto</span><span class="dist">~38 km / 30-35 min</span></div>
+        <div class="nearby-item"><span class="name">University of Toronto Mississauga</span><span class="dist">7 min drive</span></div>
+      </div>
+    </div>
+  </section>
+  <div class="cta-band reveal"><h2>Enjoy the Best of Mississauga</h2><p>Contact us today for a booking inquiry.</p><a href="#" class="btn-white" data-page="contact">Book Now</a></div>
+</div>
+
+<!-- ===== SUITES ===== -->
+<div class="page" id="page-suites">
+  <section style="padding-top:140px;">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:60px;" class="reveal">
+        <div class="section-tag" style="justify-content:center;">Our Properties</div>
+        <div class="section-title" style="margin:0 auto;">Explore Our Suites</div>
+        <p style="font-size:16px;color:var(--gray-500);max-width:600px;margin:16px auto 0;">Choose from our wide range of suites including one bedroom, two bedroom, townhouses, penthouses and more.</p>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar reveal" id="filterBar">
+        <div class="filter-group">
+          <label>Location</label>
+          <select id="filterLocation" onchange="filterSuites()">
+            <option value="">All Locations</option>
+            <option value="central">Central Mississauga</option>
+            <option value="downtown">Downtown Mississauga</option>
+            <option value="squareone">Square One Area</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Guests</label>
+          <select id="filterGuests" onchange="filterSuites()">
+            <option value="">Any</option>
+            <option value="2">1-3 Guests</option>
+            <option value="4">4-5 Guests</option>
+            <option value="6">6-7 Guests</option>
+            <option value="8">8+ Guests</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Home Type</label>
+          <select id="filterType" onchange="filterSuites()">
+            <option value="">All Types</option>
+            <option value="suite">Suite</option>
+            <option value="penthouse">Penthouse</option>
+            <option value="townhouse">Townhouse</option>
+            <option value="house">House</option>
+          </select>
+        </div>
+        <button class="filter-reset" onclick="resetFilters()">Reset</button>
+      </div>
+
+      <div class="suites-grid stagger-grid reveal" id="suitesGrid">
+        <div class="suite-card" onclick="showDetail('townhouse3br')" data-location="central" data-guests="6" data-type="townhouse">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/Erin-center-360x260.jpg" alt="Three Bedroom Townhouse" class="suite-img">
+          <div class="suite-location">Central Mississauga</div>
+          <h3>Three Bedroom Townhouse in Central Mississauga</h3>
+          <p>Spacious townhouse ideal for families in the heart of central Mississauga.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('penthouse')" data-location="downtown" data-guests="4" data-type="penthouse">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/DSCN2108-2-360x260.jpg" alt="Penthouse Suite" class="suite-img">
+          <div class="suite-location">Downtown Mississauga</div>
+          <h3>Penthouse Luxury Suite</h3>
+          <p>Premium penthouse living with breathtaking city views and luxury finishes.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('twobr')" data-location="downtown" data-guests="4" data-type="suite">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2016/03/22618-360x260.jpg" alt="Two Bedroom Suite" class="suite-img">
+          <div class="suite-location">Downtown Mississauga</div>
+          <h3>Two Bedroom Luxury Suite</h3>
+          <p>Stay in the heart of Mississauga with separate bedrooms, balcony and full kitchen.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('onebr')" data-location="downtown" data-guests="2" data-type="suite">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/DSCN2108-2-360x260.jpg" alt="One Bedroom Suite" class="suite-img">
+          <div class="suite-location">Downtown Mississauga</div>
+          <h3>One Bedroom Luxury Suite</h3>
+          <p>Perfect for solo travelers or couples, fully furnished with modern amenities.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('townhouse_sq1')" data-location="squareone" data-guests="6" data-type="townhouse">
+          <img src="http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-01-1449151217-enlarge-1.jpg" alt="Three Bedroom Townhouse Square One" class="suite-img">
+          <div class="suite-location">Square One, Downtown</div>
+          <h3>Three Bedroom Townhouse in Square One Downtown</h3>
+          <p>Walking distance to Square One Mall, restaurants, and transit.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="suite-card" onclick="showDetail('fourbr')" data-location="central" data-guests="8" data-type="house">
+          <img src="https://pathwaysuites.com/wp-content/uploads/2015/12/Erin-center-360x260.jpg" alt="Four Bedroom House" class="suite-img">
+          <div class="suite-location">Central Mississauga</div>
+          <h3>Four Bedroom House in Central Mississauga</h3>
+          <p>Our largest offering — a full four bedroom house perfect for large families.</p>
+          <span class="view-link">View Detail <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+        <div class="no-results" id="noResults" style="display:none;">
+          <h3>No Suites Found</h3>
+          <p>Try adjusting your filters to see more options.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section style="background:var(--off-white);">
+    <div class="section-inner reveal">
+      <div style="text-align:center;margin-bottom:40px;">
+        <div class="section-tag" style="justify-content:center;">Rates &amp; Policies</div>
+        <div class="section-title" style="margin:0 auto;">Important Information</div>
+      </div>
+      <div style="max-width:800px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div style="background:var(--white);padding:28px;border-radius:12px;"><h4 style="font-family:var(--font-display);font-size:18px;margin-bottom:12px;color:var(--red);">Parking</h4><p style="font-size:14px;color:var(--gray-500);line-height:1.8;">One parking space per suite included. Garage clearance: 6 feet. All levels centrally heated in winter.</p></div>
+        <div style="background:var(--white);padding:28px;border-radius:12px;"><h4 style="font-family:var(--font-display);font-size:18px;margin-bottom:12px;color:var(--red);">Payment</h4><p style="font-size:14px;color:var(--gray-500);line-height:1.8;">Visa, MasterCard, PayPal, American Express. Debit, e-mail transfer and wire transfer also accepted.</p></div>
+        <div style="background:var(--white);padding:28px;border-radius:12px;"><h4 style="font-family:var(--font-display);font-size:18px;margin-bottom:12px;color:var(--red);">Check-In / Out</h4><p style="font-size:14px;color:var(--gray-500);line-height:1.8;">Check-in: 3:00 PM. Check-out: 11:00 AM. Early/late options available at additional cost.</p></div>
+        <div style="background:var(--white);padding:28px;border-radius:12px;"><h4 style="font-family:var(--font-display);font-size:18px;margin-bottom:12px;color:var(--red);">Taxes &amp; Fees</h4><p style="font-size:14px;color:var(--gray-500);line-height:1.8;">All prices in CAD. 13% taxes for stays under one week. 3% credit card processing charge.</p></div>
+      </div>
+    </div>
+  </section>
+  <div class="cta-band reveal"><h2>Find Your Perfect Suite</h2><p>One of our team members will be happy to assist you.</p><a href="#" class="btn-white" data-page="contact">Request a Booking</a></div>
+</div>
+
+<!-- ===== PROPERTY DETAIL ===== -->
+<div class="page" id="page-detail">
+  <section style="padding-top:130px;">
+    <div class="section-inner" id="detailContent">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+</div>
+
+<!-- ===== FAQ ===== -->
+<div class="page" id="page-faq">
+  <section style="padding-top:140px;">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:60px;" class="reveal">
+        <div class="section-tag" style="justify-content:center;">Support</div>
+        <div class="section-title" style="margin:0 auto;">Frequently Asked Questions</div>
+      </div>
+      <div class="faq-list reveal" id="faqList"></div>
+    </div>
+  </section>
+  <div class="cta-band reveal"><h2>Still Have Questions?</h2><p>Our team is ready to help you find the perfect suite.</p><a href="#" class="btn-white" data-page="contact">Contact Us</a></div>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<div class="page" id="page-contact">
+  <section style="padding-top:140px;">
+    <div class="section-inner">
+      <div class="contact-grid reveal">
+        <div class="contact-info">
+          <div class="section-tag">Get in Touch</div>
+          <h3>We'd Love to Hear From You</h3>
+          <p style="font-size:16px;color:var(--gray-500);line-height:1.9;margin-bottom:36px;">One of our team members will be happy to assist you in providing accommodation solutions per your specific need, confirm availability and rates with you.</p>
+          <div class="contact-item"><div class="contact-icon-box">📞</div><div><label>Phone</label><a href="tel:9052865222">905-286-5222</a></div></div>
+          <div class="contact-item"><div class="contact-icon-box">📱</div><div><label>Toll Free</label><a href="tel:18666842358">1-866-684-2358</a></div></div>
+          <div class="contact-item"><div class="contact-icon-box">✉️</div><div><label>Email</label><a href="/cdn-cgi/l/email-protection#c5acaba3aa85b5a4b1adb2a4bcb6b0acb1a0b6eba6aaa8"><span class="__cf_email__" data-cfemail="e78e898188a79786938f90869e94928e938294c984888a">[email&#160;protected]</span></a></div></div>
+          <div class="contact-item"><div class="contact-icon-box">📍</div><div><label>Address</label><span>4065 Brickstone Mews, Suite #104<br>Mississauga, ON L5B 0G3, Canada</span></div></div>
+          <div class="contact-item"><div class="contact-icon-box">🕐</div><div><label>Hours</label><span>Open 24 Hours, 7 Days a Week</span></div></div>
+        </div>
+        <div class="contact-form">
+          <h3>Send Us a Message</h3>
+          <div class="form-row"><div class="form-group"><label>First Name</label><input type="text" placeholder="John"></div><div class="form-group"><label>Last Name</label><input type="text" placeholder="Doe"></div></div>
+          <div class="form-row"><div class="form-group"><label>Email</label><input type="email" placeholder="john@email.com"></div><div class="form-group"><label>Phone</label><input type="tel" placeholder="+1 (555) 000-0000"></div></div>
+          <div class="form-group"><label>Suite Interest</label><select><option value="">Select a suite type...</option><option>One Bedroom Suite</option><option>One Bedroom + Den</option><option>Two Bedroom Suite</option><option>Two Bedroom + Den</option><option>Three Bedroom Townhouse</option><option>Four Bedroom House</option><option>Penthouse Suite</option></select></div>
+          <div class="form-group"><label>Message</label><textarea placeholder="Tell us about your stay requirements..."></textarea></div>
+          <button class="btn-primary" style="width:100%;" onclick="alert('Thank you! Our team will contact you within 24 hours.')">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="map-section">
+    <div class="section-inner reveal">
+      <div style="text-align:center;margin-bottom:32px;">
+        <div class="section-tag" style="justify-content:center;">Find Us</div>
+        <div class="section-title" style="margin:0 auto;">Our Location</div>
+      </div>
+      <iframe class="map-frame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2888.6!2d-79.6425!3d43.5925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882b472f7b7b4f21%3A0xb8e5c20a1fd6a8e!2s4065%20Brickstone%20Mews%2C%20Mississauga%2C%20ON%20L5B%200G3!5e0!3m2!1sen!2sca!4v1" allowfullscreen loading="lazy" title="Pathway Suites Location"></iframe>
+    </div>
+  </section>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo-text">Pathway <span>Suites</span></div>
+      <p>Luxury furnished rental condos in the heart of downtown Mississauga. Your home away from home.</p>
+      <div class="newsletter-form"><input type="email" placeholder="Your email address"><button>Subscribe</button></div>
+    </div>
+    <div><h4>Quick Links</h4><ul><li><a href="#" data-page="home">Home</a></li><li><a href="#" data-page="about">About Us</a></li><li><a href="#" data-page="suites">Our Suites</a></li><li><a href="#" data-page="faq">FAQ</a></li><li><a href="#" data-page="contact">Contact Us</a></li></ul></div>
+    <div><h4>Contact</h4><ul><li><a href="tel:9052865222">905-286-5222</a></li><li><a href="tel:18666842358">1-866-684-2358</a></li><li><a href="/cdn-cgi/l/email-protection#6b02050d042b1b0a1f031c0a12181e021f0e1845080406"><span class="__cf_email__" data-cfemail="8ce5e2eae3ccfcedf8e4fbedf5fff9e5f8e9ffa2efe3e1">[email&#160;protected]</span></a></li><li style="color:var(--gray-500);font-size:14px;margin-top:8px;">4065 Brickstone Mews #104<br>Mississauga, ON L5B 0G3</li></ul></div>
+    <div><h4>Suite Types</h4><ul><li><a href="#" onclick="showDetail('onebr')">One Bedroom Suite</a></li><li><a href="#" onclick="showDetail('twobr')">Two Bedroom Suite</a></li><li><a href="#" onclick="showDetail('penthouse')">Penthouse Suite</a></li><li><a href="#" onclick="showDetail('townhouse3br')">Townhouses</a></li><li><a href="#" onclick="showDetail('fourbr')">Four Bedroom House</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Pathway Luxury Suites. All Rights Reserved. Privacy Policy.</span>
+    <div class="social-links"><a href="#" title="Twitter">𝕏</a><a href="#" title="Facebook">f</a><a href="#" title="Instagram">◎</a><a href="#" title="LinkedIn">in</a></div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ===== PROPERTY DATA =====
+const properties = {
+  townhouse3br: {
+    title: 'Three Bedroom Townhouse in Central Mississauga',
+    location: 'Central Mississauga', beds: 3, baths: 3, guests: '6-7', type: 'Entire Home',
+    images: ['https://pathwaysuites.com/wp-content/uploads/2015/12/Erin-center-360x260.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-43-1449151235-enlarge-1.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-41-1449151233-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-26-1449151228-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-17-1449151225-enlarge.jpg'],
+    description: 'This three bedroom, three bathroom fully furnished townhouse is the definition of elegance and sophistication. Come discover the wonderful lifestyle that Pathway Luxury Suites offer. Located in central Mississauga, this spacious property is ideal for families and groups seeking a home away from home with all the comforts and amenities you need for a comfortable stay.',
+    amenities: ['TV','Cable TV','Internet','Wireless Internet','Air Conditioning','Heating','Shared Pool','Parking Included','Family/Kid Friendly','Sauna','Hot Tub','Exercise Room / Gym','Games Room','Pool Room','Media Room','Party Room','Roof Top Terrace','On Site Office Lobby','Business Center (Free Printing)','Housekeeping On Request','Self Contained Kitchen']
+  },
+  penthouse: {
+    title: 'Penthouse Luxury Suite',
+    location: 'Downtown Mississauga', beds: 2, baths: 2, guests: '4-5', type: 'Penthouse Suite',
+    images: ['https://pathwaysuites.com/wp-content/uploads/2015/12/DSCN2108-2-360x260.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-01-1449151217-enlarge-1.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-24-1449151227-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-27-1449151230-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-32-1449151230-enlarge.jpg'],
+    description: 'Experience luxury living at its finest in our premium penthouse suite. This two bedroom, two bathroom fully furnished suite offers breathtaking city views and is the definition of elegance and sophistication. Just steps away from Celebration Square, Square One Mall and the Mississauga Art Gallery, the location is unparalleled. Find vibrant street life, parks, landscaped promenades, arts and culture — a new standard for living in downtown Mississauga.',
+    amenities: ['TV','Cable TV','Wireless Internet','Air Conditioning','Heating','Shared Pool','Parking Included','Sauna','Hot Tub','Exercise Room / Gym','Games Room','Business Center','Housekeeping On Request','Self Contained Kitchen','Private Balcony','City Views','Soundproof Windows']
+  },
+  twobr: {
+    title: 'Two Bedroom Luxury Suite',
+    location: 'Downtown Mississauga', beds: 2, baths: 2, guests: '4-5', type: 'Full Suite',
+    images: ['https://pathwaysuites.com/wp-content/uploads/2016/03/22618-360x260.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-44-1449151235-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-20-1449151227-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-11-1449151224-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-06-1449151219-enlarge.jpg'],
+    description: 'This two bedroom, two bathroom fully furnished suite is the definition of elegance and sophistication. Just steps away from Celebration Square, Square One Mall and the Mississauga Art Gallery. Just walk to services instead of getting into a car. Find vibrant street life, parks, landscaped promenades, arts and culture — truly a new standard and new way to live in downtown Mississauga.',
+    amenities: ['TV','Cable TV','Wireless Internet','Air Conditioning','Heating','Shared Pool','Parking Included','Family/Kid Friendly','Sauna','Hot Tub','Exercise Room / Gym','Games Room','Business Center','Housekeeping On Request','Breakfast On Request','Self Contained Kitchen','Private Balcony']
+  },
+  onebr: {
+    title: 'One Bedroom Luxury Suite',
+    location: 'Downtown Mississauga', beds: 1, baths: 1, guests: '2-3', type: 'Full Suite',
+    images: ['https://pathwaysuites.com/wp-content/uploads/2015/12/DSCN2108-2-360x260.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-12-1449151224-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-09-1449151220-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-31-1449151230-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-50-1449151237-enlarge.jpg'],
+    description: 'Perfect for solo travelers, couples, or corporate executives. This fully furnished one bedroom suite features modern amenities including a fully equipped kitchen, premium quality pillow top mattress with extra coils for comfort, premium gel fibre pillows, and high thread count white linens. Enjoy your private balcony with city views, dedicated WiFi, and free unlimited local and North America calls.',
+    amenities: ['TV','Cable TV','Wireless Internet','Air Conditioning','Heating','Shared Pool','Parking Included','Sauna','Hot Tub','Exercise Room / Gym','Housekeeping On Request','Self Contained Kitchen','Private Balcony','Washer/Dryer']
+  },
+  townhouse_sq1: {
+    title: 'Three Bedroom Townhouse In Square One Downtown Mississauga',
+    location: 'Square One, Downtown Mississauga', beds: 3, baths: 3, guests: '6-7', type: 'Entire Home',
+    images: ['http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-01-1449151217-enlarge-1.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-43-1449151235-enlarge-1.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-41-1449151233-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-26-1449151228-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-32-1449151230-enlarge.jpg'],
+    description: 'This three bedroom, three bathroom fully furnished house is the definition of elegance and sophistication. Just steps away from Celebration Square, Square One Mall and the Mississauga Art Gallery. Just walk to services instead of getting into a car. Find vibrant street life, parks, landscaped promenades, arts and culture — truly a new standard and new way to live in downtown Mississauga.',
+    amenities: ['TV','Cable TV','Internet','Wireless Internet','Air Conditioning','Heating','Shared Pool','Parking Included','Family/Kid Friendly','Suitable for Events','Sauna','Hot Tub','Exercise Room / Gym','Games Room','Pool Room','Media Room','Party Room','Roof Top Terrace','On Site Office Lobby','Business Center (Free Printing)','Housekeeping On Request','Breakfast On Request','Self Contained Kitchen']
+  },
+  fourbr: {
+    title: 'Four Bedroom House in Central Mississauga',
+    location: 'Central Mississauga', beds: 4, baths: 3, guests: '8-10', type: 'Entire Home',
+    images: ['https://pathwaysuites.com/wp-content/uploads/2015/12/Erin-center-360x260.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-17-1449151225-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-24-1449151227-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-44-1449151235-enlarge.jpg','http://pathwaysuites.com/wp-content/uploads/2015/12/virtual-tour-196150-08-1449151220-enlarge.jpg'],
+    description: 'Our largest offering — a full four bedroom house perfect for large families or groups. This fully furnished property offers all the comforts of home in central Mississauga. With spacious living and dining areas, fully equipped kitchen, private balconies, and access to all building amenities including pool, fitness centre, sauna, and games room.',
+    amenities: ['TV','Cable TV','Wireless Internet','Air Conditioning','Heating','Shared Pool','Parking Included','Family/Kid Friendly','Suitable for Events','Sauna','Hot Tub','Exercise Room / Gym','Games Room','Business Center','Housekeeping On Request','Self Contained Kitchen','Washer/Dryer','Multiple Balconies']
+  }
+};
+
+// ===== LIGHTBOX =====
+let lbImages = [], lbIndex = 0;
+function openLightbox(images, index) {
+  lbImages = images; lbIndex = index;
+  document.getElementById('lightboxImg').src = lbImages[lbIndex];
+  document.getElementById('lightboxCounter').textContent = (lbIndex+1) + ' / ' + lbImages.length;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function lightboxNext() {
+  lbIndex = (lbIndex + 1) % lbImages.length;
+  document.getElementById('lightboxImg').src = lbImages[lbIndex];
+  document.getElementById('lightboxCounter').textContent = (lbIndex+1) + ' / ' + lbImages.length;
+}
+function lightboxPrev() {
+  lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length;
+  document.getElementById('lightboxImg').src = lbImages[lbIndex];
+  document.getElementById('lightboxCounter').textContent = (lbIndex+1) + ' / ' + lbImages.length;
+}
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowRight') lightboxNext();
+  if (e.key === 'ArrowLeft') lightboxPrev();
+});
+
+// ===== PROPERTY DETAIL =====
+function showDetail(id) {
+  const p = properties[id];
+  if (!p) return;
+  const c = document.getElementById('detailContent');
+  const imgJson = JSON.stringify(p.images);
+  c.innerHTML = `
+    <a href="#" class="detail-back" data-page="suites">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to All Suites
+    </a>
+    <div class="detail-gallery">
+      ${p.images.map((img, i) => `<img src="${img}" alt="${p.title}" class="${i===0?'main-img':''}" onclick='openLightbox(${imgJson}, ${i})' onerror="this.style.background='var(--gray-200)'">`).join('')}
+    </div>
+    <div class="detail-header">
+      <h1>${p.title}</h1>
+      <div class="detail-location-tag">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${p.location}
+      </div>
+    </div>
+    <div class="detail-meta">
+      <div class="detail-meta-item"><div class="val">${p.beds}</div><div class="lbl">Bedrooms</div></div>
+      <div class="detail-meta-item"><div class="val">${p.baths}</div><div class="lbl">Bathrooms</div></div>
+      <div class="detail-meta-item"><div class="val">${p.guests}</div><div class="lbl">Guests</div></div>
+      <div class="detail-meta-item"><div class="val" style="font-size:16px;">${p.type}</div><div class="lbl">Type</div></div>
+    </div>
+    <p class="detail-desc">${p.description}</p>
+    <div class="detail-amenities-title">Amenities</div>
+    <div class="detail-amenities-grid">
+      ${p.amenities.map(a => `<div class="detail-amenity"><span class="check">✓</span>${a}</div>`).join('')}
+    </div>
+    <div class="detail-cta-box">
+      <h3>Interested in This Suite?</h3>
+      <p>Contact us to check availability and rates. Call <strong>1-866-684-2358</strong> or send us a message.</p>
+      <a href="#" class="btn-primary" data-page="contact">Check Availability</a>
+    </div>
+  `;
+  navigateTo('detail');
+  c.querySelectorAll('[data-page]').forEach(link => {
+    link.addEventListener('click', e => { e.preventDefault(); navigateTo(link.dataset.page); });
+  });
+  bindCursorHover();
+}
+
+// ===== FAQ =====
+const faqs = [
+  { q: 'What makes Pathway Suites different from hotels?', a: 'Pathway Suites is your home away from home. Unlike hotels, we provide extended stay solutions for corporate executives on assignments, relocated employees, new immigrants, medical stays, insurance housing, and buyers and sellers transitioning between homes. You get separate bedrooms, living and dining areas, a balcony, fully equipped kitchen, and laundry facilities for your exclusive use.' },
+  { q: 'What suite types are available?', a: 'We offer one bedroom, one bedroom and den, two bedroom, two bedroom and den, three bedroom townhouses, and four bedroom houses. All are fully furnished with premium amenities.' },
+  { q: 'How far are you from Toronto Pearson Airport?', a: 'We are located near Square One Mall with close access to Highways 401, 403, 407 & QEW. Toronto Pearson Airport is approximately 22 kilometres away, normal travel time about 15-20 minutes. Airport pick-up/drop-off is available on request.' },
+  { q: 'How far is downtown Toronto?', a: 'Downtown Toronto is approximately 38 kilometres away, normal travel time about 30-35 minutes. The nearest highway to Toronto is QEW. The main transit hub is at Square One.' },
+  { q: 'Do you provide parking?', a: 'Yes, one underground, secured and designated parking space is included with every suite. All parking levels are centrally heated in winter. Garage clearance is 6 feet.' },
+  { q: 'Do you provide phone and WiFi?', a: 'Yes! Free incoming/outgoing calls and free unlimited local + North America calls. Each suite has a dedicated and secured WiFi network and phone line.' },
+  { q: 'Are the suites smoke-free?', a: 'All suites are designated SMOKE FREE. A $1,000 cleaning charge applies if anyone smokes inside. We recommend smoking on the balcony with closed patio doors or outside the building.' },
+  { q: 'What amenities do the suites include?', a: 'Each suite includes separate bedroom, living/dining area, balcony, fully equipped kitchen, laundry, dedicated WiFi, phone line, and access to fitness centre, swimming pool, game room, sauna and hot tub. We provide custom-made pillow top mattresses and premium gel fibre pillows with high thread count white linens.' },
+  { q: 'What is the cancellation policy?', a: 'Five (5) days notice is required to cancel without penalty. Late cancellations are subject to a fee. 7 days notice is required to depart early or change your arrival date.' },
+  { q: 'Is there a security deposit?', a: 'Yes, a $300 refundable security deposit is collected. It is refunded after check-out, satisfactory inspection, and return of suite keys.' },
+  { q: 'Do you offer housekeeping and airport transfers?', a: 'Housekeeping is available on request with additional charges. Airport pick-up/drop-off to Toronto Pearson is available when requested in advance, with charges depending on passengers and luggage.' },
+  { q: 'Can my representative make a reservation on my behalf?', a: 'Yes, we deal with many corporate and individual representatives. We can arrange a showing at our location: TH-4, 4065 Brickstone Mews, Mississauga, ON L5B 0G3.' },
+];
+function buildFAQ() {
+  document.getElementById('faqList').innerHTML = faqs.map(f => `
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">${f.q}<span class="faq-icon">+</span></button>
+      <div class="faq-answer"><p>${f.a}</p></div>
+    </div>`).join('');
+}
+buildFAQ();
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ===== LOADER =====
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1400);
+});
+
+// ===== CUSTOM CURSOR =====
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mX = 0, mY = 0, rX = 0, rY = 0;
+document.addEventListener('mousemove', e => {
+  mX = e.clientX; mY = e.clientY;
+  dot.style.left = mX + 'px'; dot.style.top = mY + 'px';
+});
+(function animR() {
+  rX += (mX - rX) * 0.15; rY += (mY - rY) * 0.15;
+  ring.style.left = rX + 'px'; ring.style.top = rY + 'px';
+  requestAnimationFrame(animR);
+})();
+function bindCursorHover() {
+  document.querySelectorAll('a, button, input, textarea, select, .suite-card, .view-link, .detail-gallery img').forEach(el => {
+    el.addEventListener('mouseenter', () => { dot.classList.add('hover'); ring.classList.add('hover'); });
+    el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); ring.classList.remove('hover'); });
+  });
+}
+bindCursorHover();
+
+// ===== SCROLL PROGRESS + BACK TO TOP =====
+const scrollProg = document.getElementById('scrollProgress');
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  scrollProg.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+  backToTop.classList.toggle('visible', window.scrollY > 500);
+  animateCounters();
+});
+
+// ===== PAGE NAVIGATION WITH TRANSITION =====
+const pageTransition = document.getElementById('pageTransition');
+let transitioning = false;
+function navigateTo(pageName) {
+  if (transitioning) return;
+  transitioning = true;
+  pageTransition.className = 'page-transition swipe-in';
+  setTimeout(() => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + pageName);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      const pg = a.dataset.page;
+      a.classList.toggle('active-link', pg === pageName || (pageName === 'detail' && pg === 'suites'));
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    pageTransition.className = 'page-transition swipe-out';
+    setTimeout(() => {
+      pageTransition.className = 'page-transition';
+      transitioning = false;
+      document.querySelectorAll('.page.active .reveal, .page.active .stagger-grid').forEach(el => {
+        el.classList.remove('visible'); void el.offsetWidth; observer.observe(el);
+      });
+      bindCursorHover();
+    }, 350);
+  }, 350);
+}
+document.querySelectorAll('[data-page]').forEach(link => {
+  link.addEventListener('click', e => { e.preventDefault(); navigateTo(link.dataset.page); });
+});
+
+// ===== MOBILE MENU =====
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+
+// ===== ANIMATED COUNTERS =====
+let counterDone = false;
+function animateCounters() {
+  if (counterDone) return;
+  const section = document.getElementById('counterSection');
+  if (!section) return;
+  const rect = section.getBoundingClientRect();
+  if (rect.top < window.innerHeight * 0.85) {
+    counterDone = true;
+    document.querySelectorAll('.counter-num').forEach(num => {
+      const target = parseInt(num.dataset.target);
+      const duration = 1800;
+      const start = performance.now();
+      function tick(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        num.textContent = Math.floor(eased * target);
+        if (progress < 1) requestAnimationFrame(tick);
+        else num.textContent = target;
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+}
+
+// ===== TESTIMONIAL SLIDER =====
+let testSlide = 0;
+function slideTestimonials(dir) {
+  const slider = document.getElementById('testimonialSlider');
+  const cards = slider.querySelectorAll('.testimonial-card');
+  const cardWidth = cards[0].offsetWidth + 28;
+  const visible = window.innerWidth < 768 ? 1 : (window.innerWidth < 1024 ? 2 : 3);
+  const maxSlide = cards.length - visible;
+  testSlide = Math.max(0, Math.min(testSlide + dir, maxSlide));
+  slider.style.transform = 'translateX(-' + (testSlide * cardWidth) + 'px)';
+}
+
+// ===== SUITE FILTER =====
+function filterSuites() {
+  const loc = document.getElementById('filterLocation').value;
+  const guests = document.getElementById('filterGuests').value;
+  const type = document.getElementById('filterType').value;
+  const cards = document.querySelectorAll('#suitesGrid .suite-card');
+  let visible = 0;
+  cards.forEach(card => {
+    let show = true;
+    if (loc && card.dataset.location !== loc) show = false;
+    if (guests) {
+      const g = parseInt(card.dataset.guests);
+      const f = parseInt(guests);
+      if (f === 2 && g > 3) show = false;
+      if (f === 4 && (g < 4 || g > 5)) show = false;
+      if (f === 6 && (g < 6 || g > 7)) show = false;
+      if (f === 8 && g < 8) show = false;
+    }
+    if (type && card.dataset.type !== type) show = false;
+    card.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+}
+function resetFilters() {
+  document.getElementById('filterLocation').value = '';
+  document.getElementById('filterGuests').value = '';
+  document.getElementById('filterType').value = '';
+  filterSuites();
+}
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal, .stagger-grid').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
